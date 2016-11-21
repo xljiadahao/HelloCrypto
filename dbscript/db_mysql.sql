@@ -1,0 +1,15 @@
+/**
+ * Author:  xulei
+ * Created: Nov 06, 2016
+ */
+
+USE hellocrypto;
+
+CREATE TABLE `certificate` (
+`ID` int(11) NOT NULL AUTO_INCREMENT,
+`NAME` varchar(100) NOT NULL UNIQUE,
+`PUB_KEY_FINGERPRINT` varchar(100) NOT NULL UNIQUE,
+`CERTIFICATE_BINARY` blob NOT NULL,
+`TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE struts PUBLIC     "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"     
+	"http://struts.apache.org/dtds/struts-2.1.dtd"> 
+<struts>  
+    <constant name="struts.i18n.encoding"  value="UTF-8"/>
+    <constant name="struts.multipart.saveDir" value="certificatetmp"/>
+    <constant name="struts.action.extension" value="action" /> 
+   
+    <package name="crypto" extends="json-default" namespace="/rsa">  
+        <!-- http://localhost:8080/hellocrypto/namespace/actionName.action -->
+        <action name="certificateUpload" class="com.hellocrypto.action.CollectCertificateController" method="execute">             
+            <result name="success">/WEB-INF/jsp/certificate.jsp</result>   
+        </action>
+        <action name="certificate">             
+            <result name="success">/WEB-INF/jsp/certificate.jsp</result>   
+        </action>
+    </package> 
+
+</struts>
