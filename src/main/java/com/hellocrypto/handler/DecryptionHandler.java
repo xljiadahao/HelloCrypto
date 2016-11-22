@@ -1,6 +1,7 @@
 package com.hellocrypto.handler;
 
 import com.hellocrypto.bo.KeystoreBo;
+import com.hellocrypto.bo.SecureInfoBo;
 import com.hellocrypto.dao.CertificateDao;
 import com.hellocrypto.handler.validator.DecryptionValidator;
 import com.hellocrypto.utils.ByteUtil;
@@ -32,8 +33,10 @@ public class DecryptionHandler {
         return certificateDao.findNames();
     }
     
-    public String getSecureInfo(KeystoreBo keystoreBo) {
+    public SecureInfoBo getSecureInfo(KeystoreBo keystoreBo) {
+        SecureInfoBo secureInfoBo = new SecureInfoBo();
         String secureInfo = null;
+        Boolean isDecryptSuccess = false;
         if (decryptionValidator.validate(keystoreBo)) {
             InputStream is = null;
             try {
@@ -44,13 +47,16 @@ public class DecryptionHandler {
                 // 2. decrypt
                 secureInfo = new String(RSA.decrypt(
                         ByteUtil.parseHexStr2Byte(keystoreBo.getEncrypt()), prk));
+                isDecryptSuccess = true;
                 logger.info("got secure info successfully: " + secureInfo);
             } catch (FileNotFoundException ex) {
                 logger.error("decrypt error, " + ex.getMessage());
                 secureInfo = "decrypt error, " + ex.getMessage();
+                isDecryptSuccess = false;
             } catch (Exception ex) {
                 logger.error("decrypt error, " + ex.getMessage());
                 secureInfo = "decrypt error, " + ex.getMessage();
+                isDecryptSuccess = false;
             } finally {
                 try {
                     if(is != null) {
@@ -62,8 +68,11 @@ public class DecryptionHandler {
             }
         } else {
             secureInfo = "Oops, sorry, invalid input";
+            isDecryptSuccess = false;
         }
-        return secureInfo;
+        secureInfoBo.setDecryptedSecureInfo(secureInfo);
+        secureInfoBo.setDecryptSuccess(isDecryptSuccess);
+        return secureInfoBo;
     }
     
 }

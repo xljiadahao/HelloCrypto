@@ -130,7 +130,14 @@
                             <tr>
                                 <td valign="middle" align="right" style="width:150px;">Secure Info: </td>
                                 <td valign="middle" align="left" colspan="2">
-                                    <input id="secureinfo" type="text" readonly class="inputgri" style="width:480px; color:red;" value="${decryptedSecureInfo}" />
+                                    <c:choose>
+                                        <c:when test="${decryptSuccess}">
+                                            <input id="secureinfo" type="text" readonly class="inputgri" style="width:480px; color:green;" value="${decryptedSecureInfo}" />
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input id="secureinfo" type="text" readonly class="inputgri" style="width:480px; color:red;" value="${decryptedSecureInfo}" />
+                                        </c:otherwise>
+                                    </c:choose> 
                                 </td>
                             </tr>
                             <tr>

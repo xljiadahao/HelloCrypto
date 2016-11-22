@@ -1,6 +1,7 @@
 package com.hellocrypto.action;
 
 import com.hellocrypto.bo.KeystoreBo;
+import com.hellocrypto.bo.SecureInfoBo;
 import com.hellocrypto.cache.LuckyDrawResult;
 import com.hellocrypto.handler.DecryptionHandler;
 import java.io.File;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DecryptionController extends BaseAction {
 
     // private static final Logger logger = Logger.getLogger(DecryptionController.class);
-
     @Autowired
     private DecryptionHandler decryptionHandler;
 
@@ -31,6 +31,7 @@ public class DecryptionController extends BaseAction {
 
     // output
     private String decryptedSecureInfo;
+    private Boolean decryptSuccess;
     // pre-prepared data
     private List<String> participateNames = new ArrayList<String>();
     private List<String> secureInfo = new ArrayList<String>();
@@ -44,7 +45,9 @@ public class DecryptionController extends BaseAction {
         secureInfo.addAll(LuckyDrawResult.getLuckDrawResults());
         // prepare participate names
         participateNames.addAll(decryptionHandler.preDecryptGetParticipateName());
-        decryptedSecureInfo = decryptionHandler.getSecureInfo(constructKeystoreBo());
+        SecureInfoBo secureInfoBo = decryptionHandler.getSecureInfo(constructKeystoreBo());
+        decryptedSecureInfo = secureInfoBo.getDecryptedSecureInfo();
+        decryptSuccess = secureInfoBo.getDecryptSuccess();
         return "success";
     }
 
@@ -58,6 +61,14 @@ public class DecryptionController extends BaseAction {
         keystoreBo.setFileFileName(fileFileName);
         keystoreBo.setFileContentType(fileContentType);
         return keystoreBo;
+    }
+
+    public Boolean getDecryptSuccess() {
+        return decryptSuccess;
+    }
+
+    public void setDecryptSuccess(Boolean decryptSuccess) {
+        this.decryptSuccess = decryptSuccess;
     }
 
     public String getEncrypt() {

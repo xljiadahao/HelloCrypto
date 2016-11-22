@@ -19,6 +19,7 @@
             $(function(){
                 if(${msg != null && !"".equals(msg)}){
                     alert ('${msg}');
+                    location.href="certificate.action";
                 }
 		$("#submitForm").click(function(){
                     var v = validateForm();
