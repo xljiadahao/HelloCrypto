@@ -11,5 +11,6 @@ public interface CertificateDao {
     
     public void addCertificate(Certificate certificate) throws Exception;
     public List<Certificate> findAll();
+    public List<String> findNames();
     
 }

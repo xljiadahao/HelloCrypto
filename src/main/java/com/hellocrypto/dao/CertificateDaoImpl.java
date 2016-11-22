@@ -2,6 +2,7 @@ package com.hellocrypto.dao;
 
 import com.hellocrypto.entity.Certificate;
 import com.hellocrypto.exception.BadReqException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.PersistenceException;
 import javax.persistence.criteria.CriteriaQuery;
@@ -43,6 +44,17 @@ public class CertificateDaoImpl extends BaseDao<Certificate> implements Certific
         CriteriaQuery query = this.getEntityManager().getCriteriaBuilder().createQuery();
         query.select(query.from(Certificate.class));
         return this.getEntityManager().createQuery(query).getResultList();
+    }
+
+    @Override
+    public List<String> findNames() {
+        List<String> participants = new ArrayList<String>();
+        for (Certificate cer : this.findAll()) {
+            if (cer != null && cer.getName() != null && !"".equals(cer.getName())) {
+                participants.add(cer.getName());
+            }
+        }
+        return participants;
     }
  
 }

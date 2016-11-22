@@ -45,7 +45,12 @@
                     </div>
                     <div id="navigation">
                         <a href="certificate.action"><font size="2">Certificate</font></a>
-                        <a href="#"><font size="2">Decryption</font></a>
+                        <c:choose>
+                            <c:when test="${decryptEnabled}">
+                                <a href="decryption.action"><font size="2">Decryption</font></a>
+                            </c:when>
+                            <c:otherwise><font size="2">Decryption</font></c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
                 

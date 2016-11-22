@@ -26,8 +26,10 @@
 
     <bean id="certificateHandler" class="com.hellocrypto.handler.CertificateHandler"></bean>
     <bean id="adminCommandHandler" class="com.hellocrypto.handler.AdminCommandHandler"></bean>
+    <bean id="decryptionHandler" class="com.hellocrypto.handler.DecryptionHandler"></bean>
     <bean id="certificateValidator" class="com.hellocrypto.handler.validator.CertificateValidator"></bean>
     <bean id="adminCommandValidator" class="com.hellocrypto.handler.validator.AdminCommandValidator"></bean>
+    <bean id="decryptionValidator" class="com.hellocrypto.handler.validator.DecryptionValidator"></bean>
     <bean id="certificateDao" class="com.hellocrypto.dao.CertificateDaoImpl"></bean>
 
 </beans>

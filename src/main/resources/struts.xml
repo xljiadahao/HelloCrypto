@@ -11,9 +11,22 @@
         <action name="certificateUpload" class="com.hellocrypto.action.CollectCertificateController" method="execute">             
             <result name="success">/WEB-INF/jsp/certificate.jsp</result>   
         </action>
-        <action name="certificate">             
+        <action name="certificate" class="com.hellocrypto.action.CollectCertificateController" method="prereq">             
             <result name="success">/WEB-INF/jsp/certificate.jsp</result>   
         </action>
-    </package> 
-
+        <action name="decryption" class="com.hellocrypto.action.PreDecryptionController" method="execute">             
+            <result name="success">/WEB-INF/jsp/decryption.jsp</result>
+            <result name="failure" type="redirectAction">
+                <param name="namespace">/rsa</param>
+		<param name="actionName">certificate.action</param>
+            </result> 
+        </action>
+        <action name="decryptionSubmit" class="com.hellocrypto.action.DecryptionController" method="execute">
+            <result name="success">/WEB-INF/jsp/decryption.jsp</result>
+            <result name="failure" type="redirectAction">
+                <param name="namespace">/rsa</param>
+		<param name="actionName">certificate.action</param>
+            </result>
+        </action>
+    </package>
 </struts>

@@ -1,11 +1,11 @@
 package com.hellocrypto.action;
 
+import com.hellocrypto.cache.LuckyDrawResult;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.CertificateHandler;
 import java.io.File;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 /**
  *
@@ -14,24 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class CollectCertificateController extends BaseAction {
 
     private static final Logger logger = Logger.getLogger(CollectCertificateController.class);
-    
+
     @Autowired
     private CertificateHandler crtificateHandler;
-    
+
     // input
     private String name;
     // structs2 upload to the tmp folder and store as a tmp file
     private File file;
     private String fileFileName;
     private String fileContentType;
-    
+
     // output
     private String msg;
+    private Boolean decryptEnabled = false;
 
     @Override
-    public String execute() throws Exception {
+    public String execute() {
         // costruct input data, a. name, file
-        logger.info("certificate req, name: " + name + ", fileFileName: " + fileFileName 
+        logger.info("certificate req, name: " + name + ", fileFileName: " + fileFileName
                 + ", tmp file path: " + (file == null ? "null" : file.getAbsolutePath()));
         try {
             // InputStream is = new FileInputStream(file);
@@ -44,43 +45,58 @@ public class CollectCertificateController extends BaseAction {
         }
         return "success";
     }
-    
+
+    public String prereq() {
+        if (LuckyDrawResult.getLuckDrawResults() != null && !LuckyDrawResult.getLuckDrawResults().isEmpty()) {
+            decryptEnabled = true;
+        }
+        return "success";
+    }
+
+    public Boolean getDecryptEnabled() {
+        return decryptEnabled;
+    }
+
+    public void setDecryptEnabled(Boolean decryptEnabled) {
+        this.decryptEnabled = decryptEnabled;
+    }
+
     public String getMsg() {
         return msg;
     }
-    
+
     public void setMsg(String msg) {
         this.msg = msg;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public File getFile() {
         return file;
     }
-    
+
     public void setFile(File file) {
         this.file = file;
     }
-    
+
     public String getFileFileName() {
         return fileFileName;
     }
-    
+
     public void setFileFileName(String fileFileName) {
         this.fileFileName = fileFileName;
     }
-    
+
     public String getFileContentType() {
         return fileContentType;
     }
-    
+
     public void setFileContentType(String fileContentType) {
         this.fileContentType = fileContentType;
     }
