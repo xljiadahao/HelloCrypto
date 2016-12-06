@@ -27,7 +27,7 @@ public class CertificateTest {
                 + ", issuer-" + cert.getIssuerDN().getName());
         PublicKey puk = cert.getPublicKey();
         RSAPublicKey rsaPubKey = (RSAPublicKey) puk;
-        System.out.println("RSA Public Key Modules: " + rsaPubKey.getModulus());
+        System.out.println("RSA Public Key Modules: " + rsaPubKey.getModulus() + ", length: " + rsaPubKey.getEncoded().length);
         System.out.println("RSA Public Key Public Exponent: " + rsaPubKey.getPublicExponent());
         BASE64Encoder bse = new BASE64Encoder();
         System.out.println("pk:" + bse.encode(puk.getEncoded()));
