@@ -33,6 +33,13 @@ public class AdminCommandHandler {
     @Autowired
     private CertificateDao certificateDao;
     
+    public AdminCommandHandler() {}
+    
+    public AdminCommandHandler(AdminCommandValidator adminCommandValidator, CertificateDao certificateDao) {
+        this.adminCommandValidator = adminCommandValidator;
+        this.certificateDao = certificateDao;
+    }
+    
     public LuckyDrawBo handleLuckyDrawReq(Map<String, Object> requestParams) {
         LuckyDrawBo luckyDrawBo = new LuckyDrawBo();
         try {
