@@ -4,6 +4,7 @@ import com.hellocrypto.bo.LuckyDrawBo;
 import com.hellocrypto.cache.LuckyDrawResult;
 import com.hellocrypto.dao.CertificateDao;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.handler.validator.AdminCommandValidator;
 import com.hellocrypto.utils.ByteUtil;
 import com.hellocrypto.utils.crypto.RSA;
@@ -51,7 +52,8 @@ public class AdminCommandHandler {
                 for (String txt : luckDrawText) {
                     logger.info("lucky draw text: " + txt);
                 }
-                List<Certificate> certificates = certificateDao.findAll();
+                // lucky draw for ad-hoc individual user
+                List<Certificate> certificates = certificateDao.findCertificatesByType(ClientType.INDIVIDUAL);
                 if (certificates != null && (certificates.size() >= resultSize)) {
                     List<Certificate> drawCers = new ArrayList<Certificate>();
                     int[] index = getRandomIndex(certificates.size(), resultSize);

@@ -3,6 +3,7 @@ package com.hellocrypto.handler;
 import com.hellocrypto.bo.KeystoreBo;
 import com.hellocrypto.bo.SecureInfoBo;
 import com.hellocrypto.dao.CertificateDao;
+import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.handler.validator.DecryptionValidator;
 import com.hellocrypto.utils.ByteUtil;
 import com.hellocrypto.utils.crypto.KeystoreUtil;
@@ -30,7 +31,7 @@ public class DecryptionHandler {
     private DecryptionValidator decryptionValidator;
     
     public List<String> preDecryptGetParticipateName() {
-        return certificateDao.findNames();
+        return certificateDao.findNames(ClientType.INDIVIDUAL);
     }
     
     public SecureInfoBo getSecureInfo(KeystoreBo keystoreBo) {

@@ -1,5 +1,6 @@
 package com.hellocrypto.entity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import javax.persistence.Basic;
@@ -8,15 +9,20 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  *
- * @author leixu2
+ * @author xulei
  */
 @Entity
 @Table(name="certificate")
-public class Certificate {
+@NamedQueries({
+    @NamedQuery(name = "Certificate.findCertificatesByType", 
+            query = "SELECT cert FROM Certificate cert WHERE cert.type = :type ORDER BY cert.timestamp DESC")})
+public class Certificate implements Serializable {
 
     @Id
     @GeneratedValue
@@ -32,6 +38,9 @@ public class Certificate {
     @Column(name = "CERTIFICATE_BINARY")
     @Lob
     private byte[] certificateBinary;
+    @Basic
+    @Column(name="TYPE")
+    private String type;
     @Basic
     @Column(name="TIMESTAMP")
     private Timestamp timestamp;
@@ -66,6 +75,14 @@ public class Certificate {
 
     public void setCertificateBinary(byte[] certificateBinary) {
         this.certificateBinary = certificateBinary;
+    }
+    
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
     
     public Timestamp getTimestamp() {

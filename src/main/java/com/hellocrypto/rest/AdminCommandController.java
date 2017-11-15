@@ -34,7 +34,7 @@ public class AdminCommandController {
     @ResponseBody
     public LuckyDrawBo triggerLuckyDraw(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
             @RequestBody Map<String, Object> requestBody) {
-        logger.info("triggered lucky draw");
+        logger.info("triggered ad-hoc lucky draw");
         // List<String> text = (List<String>)requestBody.get("luckDrawText");
         // String num = (String)requestBody.get("luckDrawNum");
         return adminCommandHandler.handleLuckyDrawReq(requestBody);

@@ -2,6 +2,7 @@ package com.hellocrypto.handler;
 
 import com.hellocrypto.dao.CertificateDao;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.validator.CertificateValidator;
 import com.hellocrypto.utils.ByteUtil;
@@ -61,6 +62,7 @@ public class CertificateHandler {
                 certificate.setName(name);
                 certificate.setCertificateBinary(cerRawBinary);
                 certificate.setPubKeyFingerprint(pubkFingerprint);
+                certificate.setType(ClientType.INDIVIDUAL.getPersistClientType());
                 certificate.setTimestamp(new Timestamp(new Date().getTime()));
                 certificateDao.addCertificate(certificate);
             } catch (BadReqException ex) {
