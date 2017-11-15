@@ -3,6 +3,7 @@ package com.hellocrypto.test.handler;
 import com.hellocrypto.bo.LuckyDrawBo;
 import com.hellocrypto.dao.CertificateDaoImpl;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.handler.AdminCommandHandler;
 import com.hellocrypto.handler.validator.AdminCommandValidator;
 import com.hellocrypto.utils.ByteUtil;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import static org.junit.Assert.*;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -79,6 +82,7 @@ public class AdminCommandHandlerTest {
         certificates.add(certificate2);
         certificates.add(certificate3);
         when(mockCertificateDao.findAll()).thenReturn(certificates);
+        when(mockCertificateDao.findCertificatesByType(Mockito.any(ClientType.class))).thenReturn(certificates);
         
         adminCommandHandler = new AdminCommandHandler(new AdminCommandValidator(), mockCertificateDao);
     }
