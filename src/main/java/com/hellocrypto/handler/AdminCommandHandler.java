@@ -3,13 +3,19 @@ package com.hellocrypto.handler;
 import com.hellocrypto.bo.LuckyDrawBo;
 import com.hellocrypto.cache.LuckyDrawResult;
 import com.hellocrypto.dao.CertificateDao;
+import com.hellocrypto.dao.GroupDao;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.entity.Group;
 import com.hellocrypto.enumeration.ClientType;
+import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.validator.AdminCommandValidator;
 import com.hellocrypto.utils.ByteUtil;
+import com.hellocrypto.utils.crypto.MD5;
 import com.hellocrypto.utils.crypto.RSA;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +40,8 @@ public class AdminCommandHandler {
     private AdminCommandValidator adminCommandValidator;
     @Autowired
     private CertificateDao certificateDao;
+    @Autowired
+    private GroupDao groupDao;
     
     public AdminCommandHandler() {}
     
@@ -93,6 +102,99 @@ public class AdminCommandHandler {
         }
         luckyDrawBo.setTimestamp(sdf.format(new Date()));
         return luckyDrawBo;
+    }
+    
+    public String generateGroupIdentifier(Map<String, Object> requestParams) 
+            throws NoSuchAlgorithmException, UnsupportedEncodingException, BadReqException {
+        if (adminCommandValidator.validateGenGroupIdReq(requestParams)) {
+            String orgName = (String) requestParams.get("orgName");
+            String activityName = (String) requestParams.get("activityName");
+            Integer maxCount = null;
+            try{
+                String maxCountStr = (String) requestParams.get("maxCount");
+                if (StringUtils.isNumeric(maxCountStr)) {
+                    maxCount = Integer.parseInt(maxCountStr);
+                }
+            } catch (Exception ex) {
+                logger.error("unexpected exception, " + ex.getMessage());
+            }
+            // generate 5 characters Group Identifier   
+            String groupIdentifier = null;
+            // maximum re-try is 3 times
+            int reGenTimes = 0;
+            while (true) {
+                groupIdentifier = groupIdentifierGenerator(orgName, activityName);
+                if (checkIsValid(groupIdentifier)) {
+                    logger.info("groupIdentifier successfully generated, id: " + groupIdentifier);
+                    break;
+                } else {
+                    reGenTimes++;
+                }
+                if (reGenTimes >= 3) {
+                    throw new RuntimeException("invalid groupIdentifier");
+                }
+            }
+            // add Group record
+            Group newRegisteredGroup = constructGroupEntity(groupIdentifier, orgName, activityName, maxCount);
+            try{
+                groupDao.registerGroup(newRegisteredGroup);
+                return newRegisteredGroup.getIdentifier();
+            } catch (Exception ex) {
+                logger.error("group persistence error, " + ex.getMessage());
+                throw new RuntimeException("group persistence error, " + ex.getMessage());
+            }
+        } else {
+            throw new BadReqException("orgName and activityName validate failed");
+        }
+    }
+    
+    private Group constructGroupEntity(String groupIdentifier, String orgName, String activityName, Integer maxCount) {
+        Group group = new Group();
+        group.setIdentifier(groupIdentifier);
+        group.setOrgName(orgName);
+        group.setActivityName(activityName);
+        if (maxCount != null) {
+           group.setMaxCount(maxCount);
+        }
+        group.setIsActivated(Boolean.TRUE);
+        group.setTimestamp(new Timestamp(new Date().getTime()));
+        return group;
+    }
+    
+    private boolean checkIsValid(String groupIdentifier) {
+        boolean isValid = true;
+        // 1. basic validation
+        if (StringUtils.isBlank(groupIdentifier) || groupIdentifier.length() != 5) {
+            logger.error("invalid groupIdentifier");
+            isValid = false;
+        }
+        // 2. duplicated validation
+        if (isValid) {
+            Group group = groupDao.findByGroupId(groupIdentifier);
+            if (group != null) {
+                logger.error("duplicated groupIdentifier");
+                isValid = false;
+            }
+        }
+        return isValid;
+    }
+    
+    /**
+     * the algorithm to generate the Group Identifier 
+     * orgName+activityName+timestamp, hash, then get the first 5 characters
+     */
+    private String groupIdentifierGenerator(String orgName, String activityName) 
+            throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        StringBuilder hashContent = new StringBuilder();
+        hashContent.append(orgName);
+        hashContent.append(activityName);
+        hashContent.append(new Date().getTime());
+        String digest = MD5.md5Base64(hashContent.toString());
+        if (StringUtils.isNotBlank(digest) && digest.length() >= 5) {
+            return digest.substring(0, 5);
+        } else {
+            return null;
+        }
     }
     
     // <name, encrypted text>

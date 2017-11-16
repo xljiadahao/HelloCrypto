@@ -3,6 +3,7 @@ package com.hellocrypto.handler.validator;
 import com.hellocrypto.cache.Constant;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -39,6 +40,16 @@ public class AdminCommandValidator {
             logger.error("exception, " + ex.getMessage());
             throw ex;
         }
+    }
+    
+    public boolean validateGenGroupIdReq(Map<String, Object> requestParams) {
+        String orgName = (String) requestParams.get("orgName");
+        String activityName = (String) requestParams.get("activityName");
+        if (StringUtils.isBlank(orgName) || StringUtils.isBlank(activityName)) {
+            logger.error("bad request, invalid input orgName or activityName");
+            return false;
+        }
+        return true;
     }
     
 }

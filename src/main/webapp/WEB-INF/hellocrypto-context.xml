@@ -31,5 +31,6 @@
     <bean id="adminCommandValidator" class="com.hellocrypto.handler.validator.AdminCommandValidator"></bean>
     <bean id="decryptionValidator" class="com.hellocrypto.handler.validator.DecryptionValidator"></bean>
     <bean id="certificateDao" class="com.hellocrypto.dao.CertificateDaoImpl"></bean>
+    <bean id="groupDao" class="com.hellocrypto.dao.GroupDaoImpl"></bean>
 
 </beans>

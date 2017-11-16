@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hellocrypto.bo.LuckyDrawBo;
+import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.AdminCommandHandler;
 
 /**
@@ -34,10 +35,31 @@ public class AdminCommandController {
     @ResponseBody
     public LuckyDrawBo triggerLuckyDraw(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
             @RequestBody Map<String, Object> requestBody) {
-        logger.info("triggered ad-hoc lucky draw");
+        logger.info("triggering ad-hoc lucky draw");
         // List<String> text = (List<String>)requestBody.get("luckDrawText");
         // String num = (String)requestBody.get("luckDrawNum");
         return adminCommandHandler.handleLuckyDrawReq(requestBody);
+    }
+    
+    /**
+     * request contains orgName, activityName, maxCount (optional)
+     */
+    @RequestMapping(value = "groupgen", method = RequestMethod.POST)
+    public String generateGroupIdentifier(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
+            @RequestBody Map<String, Object> requestBody) {
+        logger.info("generating group identifier for org lucky draw");
+        String response = null;
+        try {
+            response = adminCommandHandler.generateGroupIdentifier(requestBody);
+        } catch (BadReqException ex) {
+            logger.error("BadReqException during group ID generating, " + ex.getMessage());
+            response = "The request is invalid, please try it again";
+        }
+        catch (Exception ex) {
+            logger.error("unexpected error during group ID generating, " + ex.getMessage());
+            response = "Oops, sorry, we got some problems, our engineers are working on it, please come back later";
+        }
+        return response;
     }
     
 }

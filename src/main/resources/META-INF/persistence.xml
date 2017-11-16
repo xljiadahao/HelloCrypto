@@ -4,6 +4,7 @@
     <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
     <jta-data-source>java:jboss/datasources/hellocryptoDS</jta-data-source>
     <class>com.hellocrypto.entity.Certificate</class>
+    <class>com.hellocrypto.entity.Group</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
     </properties>

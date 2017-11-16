@@ -18,7 +18,7 @@ import javax.persistence.Table;
  * @author xulei
  */
 @Entity
-@Table(name="certificate")
+@Table(name="`certificate`")
 @NamedQueries({
     @NamedQuery(name = "Certificate.findCertificatesByType", 
             query = "SELECT cert FROM Certificate cert WHERE cert.type = :type ORDER BY cert.timestamp DESC")})
@@ -27,7 +27,7 @@ public class Certificate implements Serializable {
     @Id
     @GeneratedValue
     @Column(name = "ID")
-    private Integer id;
+    private Long id;
     @Basic
     @Column(name="NAME")
     private String name;
@@ -45,11 +45,11 @@ public class Certificate implements Serializable {
     @Column(name="TIMESTAMP")
     private Timestamp timestamp;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
