@@ -2,11 +2,14 @@ package com.hellocrypto.entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.Objects;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -35,6 +38,9 @@ public class Group implements Serializable {
     @Basic
     @Column(name="TIMESTAMP")
     private Timestamp timestamp;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group")
+    private Collection<Certificate> certificates;
 
     public String getIdentifier() {
         return identifier;
@@ -84,6 +90,14 @@ public class Group implements Serializable {
         this.timestamp = timestamp;
     }
 
+    public Collection<Certificate> getCertificates() {
+        return certificates;
+    }
+
+    public void setCertificates(Collection<Certificate> certificates) {
+        this.certificates = certificates;
+    }
+    
     @Override
     public String toString() {
         return "Group{" + "identifier=" + identifier + ", orgName=" + orgName 

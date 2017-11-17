@@ -8,7 +8,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -44,6 +46,10 @@ public class Certificate implements Serializable {
     @Basic
     @Column(name="TIMESTAMP")
     private Timestamp timestamp;
+    
+    @JoinColumn(name = "GROUP_ID", referencedColumnName = "IDENTIFIER")
+    @ManyToOne(optional = true)
+    private Group group;
 
     public Long getId() {
         return id;
@@ -91,6 +97,14 @@ public class Certificate implements Serializable {
     
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     @Override

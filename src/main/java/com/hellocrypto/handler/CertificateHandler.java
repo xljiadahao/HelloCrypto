@@ -1,23 +1,30 @@
 package com.hellocrypto.handler;
 
+import com.hellocrypto.bo.GroupParticipationBo;
 import com.hellocrypto.dao.CertificateDao;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.entity.Group;
 import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.validator.CertificateValidator;
 import com.hellocrypto.utils.ByteUtil;
 import com.hellocrypto.utils.crypto.CertificateUtil;
 import com.hellocrypto.utils.crypto.MD5;
+import com.hellocrypto.utils.crypto.RSA;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Map;
 import javax.persistence.RollbackException;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,6 +104,44 @@ public class CertificateHandler {
             }
         } else {
             throw new BadReqException("name or certificate is empty.");
+        }
+    }
+    
+    public GroupParticipationBo handClientParticipationReq(Map<String, Object> requestBody) 
+            throws BadReqException, NoSuchAlgorithmException, IOException, Exception {
+        String name = (String) requestBody.get("name");
+        String groupIdentifier = (String) requestBody.get("groupIdentifier");
+        Group group = certificateValidator.clientParticipateValidate(name, groupIdentifier);
+        if (group != null) {
+            // 1. generate the RSA keypair file
+            KeyPair rsaKeyPair = RSA.generateKeyPair();
+            PublicKey pbkey = rsaKeyPair.getPublic();
+            // 2. prepare public key and its md5 digest
+            String pubkRawHex = ByteUtil.parseByte2HexStr(pbkey.getEncoded());
+            String pubkFingerprint = MD5.md5Base64(pubkRawHex);
+            byte[] cerRawBinary = ByteUtil.parseHexStr2Byte(pubkRawHex);
+            Certificate certificate = new Certificate();
+            certificate.setName(name);
+            certificate.setCertificateBinary(cerRawBinary);
+            certificate.setPubKeyFingerprint(pubkFingerprint);
+            certificate.setType(ClientType.GROUP.getPersistClientType());
+            certificate.setGroup(group);
+            certificate.setTimestamp(new Timestamp(new Date().getTime()));
+            certificateDao.addCertificate(certificate);
+            // 3. populate secure key for response
+            PrivateKey prkey = rsaKeyPair.getPrivate();
+            String prvkRawHex = ByteUtil.parseByte2HexStr(prkey.getEncoded());
+            logger.info("secure key raw hex: " + prvkRawHex);
+            // 4. populate the response
+            GroupParticipationBo groupParticipationBo = new GroupParticipationBo();
+            groupParticipationBo.setName(name);
+            groupParticipationBo.setSecureKey(prvkRawHex);
+            groupParticipationBo.setGroupIdentifier(group.getIdentifier());
+            groupParticipationBo.setOrgName(group.getOrgName());
+            groupParticipationBo.setActivityName(group.getActivityName());
+            return groupParticipationBo;
+        } else {
+            throw new BadReqException("group not exist or nonactivated");
         }
     }
     

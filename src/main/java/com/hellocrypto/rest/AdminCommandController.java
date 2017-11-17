@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hellocrypto.bo.LuckyDrawBo;
+import com.hellocrypto.constant.ResponseMessage;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.AdminCommandHandler;
 
@@ -45,21 +46,19 @@ public class AdminCommandController {
      * request contains orgName, activityName, maxCount (optional)
      */
     @RequestMapping(value = "groupgen", method = RequestMethod.POST)
+    @ResponseBody
     public String generateGroupIdentifier(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
             @RequestBody Map<String, Object> requestBody) {
         logger.info("generating group identifier for org lucky draw");
-        String response = null;
         try {
-            response = adminCommandHandler.generateGroupIdentifier(requestBody);
+            return adminCommandHandler.generateGroupIdentifier(requestBody);
         } catch (BadReqException ex) {
             logger.error("BadReqException during group ID generating, " + ex.getMessage());
-            response = "The request is invalid, please try it again";
-        }
-        catch (Exception ex) {
+            throw new RuntimeException(ResponseMessage.BAD_REQ);
+        } catch (Exception ex) {
             logger.error("unexpected error during group ID generating, " + ex.getMessage());
-            response = "Oops, sorry, we got some problems, our engineers are working on it, please come back later";
+            throw new RuntimeException(ResponseMessage.INTERNAL_SERVER_ERROR);
         }
-        return response;
     }
-    
+
 }
