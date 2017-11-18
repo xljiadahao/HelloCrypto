@@ -61,4 +61,20 @@ public class AdminCommandController {
         }
     }
 
+    /**
+     * request contains groupIdentifier, groupStatus (ACTIVE|IN_ACTIVE)
+     */
+    @RequestMapping(value = "groupchannel", method = RequestMethod.PUT)
+    @ResponseBody
+    public Boolean groupchannelControl(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
+            @RequestBody Map<String, Object> requestBody) {
+        logger.info("group channel status control");
+        try {
+            return adminCommandHandler.changeGroupChannelStatus(requestBody);
+        } catch (Exception ex) {
+            logger.error("unexpected error during changing group status, " + ex.getMessage());
+            throw new RuntimeException(ResponseMessage.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

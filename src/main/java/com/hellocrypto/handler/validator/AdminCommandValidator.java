@@ -1,10 +1,14 @@
 package com.hellocrypto.handler.validator;
 
 import com.hellocrypto.cache.Constant;
+import com.hellocrypto.dao.GroupDao;
+import com.hellocrypto.entity.Group;
+import com.hellocrypto.enumeration.GroupStatus;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -13,6 +17,9 @@ import org.apache.log4j.Logger;
 public class AdminCommandValidator {
     
     private static final Logger logger = Logger.getLogger(AdminCommandValidator.class);
+    
+    @Autowired
+    private GroupDao groupDao;
     
     public boolean validateStartLuckyDrawReq(Map<String, Object> requestParams) {
         String luckDrawNum = (String) requestParams.get("luckDrawNum");
@@ -50,6 +57,23 @@ public class AdminCommandValidator {
             return false;
         }
         return true;
+    }
+    
+    public Group validateChangeGroupStatusReq(String groupIdentifier, String groupStatus) {
+        try {
+            GroupStatus.valueOf(groupStatus);
+        } catch (Exception ex) {
+            logger.error("bad request, invalid groupStatus, " + ex.getMessage());
+            return null;
+        }
+        return existGroupValidate(groupIdentifier);
+    }
+    
+    private Group existGroupValidate(String groupIdentifier) {
+        if (StringUtils.isBlank(groupIdentifier)) {
+            return null;
+        }
+        return groupDao.findByGroupId(groupIdentifier);
     }
     
 }

@@ -10,5 +10,6 @@ public interface GroupDao {
     
     public Group findByGroupId(String groupIdentifier);
     public void registerGroup(Group group);
+    public void updateGroup(Group group);
     
 }

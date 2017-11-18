@@ -141,7 +141,7 @@ public class CertificateHandler {
             groupParticipationBo.setActivityName(group.getActivityName());
             return groupParticipationBo;
         } else {
-            throw new BadReqException("group not exist or nonactivated");
+            throw new BadReqException("group not exist or inactive");
         }
     }
     

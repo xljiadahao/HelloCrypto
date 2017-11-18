@@ -26,5 +26,11 @@ public class GroupDaoImpl extends BaseDao<Group> implements GroupDao {
     public void registerGroup(Group group) {
         this.create(group);
     }
+
+    @Override
+    @Transactional(Transactional.TxType.REQUIRED)
+    public void updateGroup(Group group) {
+        this.edit(group);
+    }
     
 }

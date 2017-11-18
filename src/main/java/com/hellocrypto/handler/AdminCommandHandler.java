@@ -7,6 +7,7 @@ import com.hellocrypto.dao.GroupDao;
 import com.hellocrypto.entity.Certificate;
 import com.hellocrypto.entity.Group;
 import com.hellocrypto.enumeration.ClientType;
+import com.hellocrypto.enumeration.GroupStatus;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.validator.AdminCommandValidator;
 import com.hellocrypto.utils.ByteUtil;
@@ -147,6 +148,20 @@ public class AdminCommandHandler {
             throw new BadReqException("orgName and activityName validate failed");
         }
     }
+    
+    public Boolean changeGroupChannelStatus(Map<String, Object> requestBody) {
+        String groupIdentifier = (String) requestBody.get("groupIdentifier");
+        String groupStatus = (String) requestBody.get("groupStatus");
+        Group group = adminCommandValidator.validateChangeGroupStatusReq(groupIdentifier, groupStatus);
+        if (group != null) {
+            group.setIsActivated(GroupStatus.valueOf(groupStatus).getPersistFlag());
+            groupDao.updateGroup(group);
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     
     private Group constructGroupEntity(String groupIdentifier, String orgName, String activityName, Integer maxCount) {
         Group group = new Group();
