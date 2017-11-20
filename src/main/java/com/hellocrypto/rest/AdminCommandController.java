@@ -32,11 +32,14 @@ public class AdminCommandController {
     
     public AdminCommandController() {}
     
+    /**
+     * luckDrawNum, luckDrawText, groupIdentifier (for group lucky draw only)
+     */
     @RequestMapping(value = "securedraw", method = RequestMethod.PUT)
     @ResponseBody
     public LuckyDrawBo triggerLuckyDraw(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
             @RequestBody Map<String, Object> requestBody) {
-        logger.info("triggering ad-hoc lucky draw");
+        logger.info("triggering lucky draw");
         // List<String> text = (List<String>)requestBody.get("luckDrawText");
         // String num = (String)requestBody.get("luckDrawNum");
         return adminCommandHandler.handleLuckyDrawReq(requestBody);
@@ -76,5 +79,5 @@ public class AdminCommandController {
             throw new RuntimeException(ResponseMessage.INTERNAL_SERVER_ERROR);
         }
     }
-
+  
 }

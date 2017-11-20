@@ -32,7 +32,7 @@ public class CertificateValidator {
         if (StringUtils.isBlank(name) || StringUtils.isBlank(groupIdentifier)) {
             return null;
         }
-        Group group = groupDao.findByGroupId(groupIdentifier);
+        Group group = groupDao.findByGroupId(groupIdentifier, false);
         // group should be activated
         if (group == null || !group.getIsActivated()) {
             return null;

@@ -8,7 +8,7 @@ import com.hellocrypto.entity.Group;
  */
 public interface GroupDao {
     
-    public Group findByGroupId(String groupIdentifier);
+    public Group findByGroupId(String groupIdentifier, boolean loadCert);
     public void registerGroup(Group group);
     public void updateGroup(Group group);
     

@@ -1,11 +1,13 @@
 package com.hellocrypto.action;
 
 import com.hellocrypto.cache.LuckyDrawResult;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.handler.DecryptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -24,11 +26,11 @@ public class PreDecryptionController extends BaseAction {
 
     @Override
     public String execute() {
-        if (LuckyDrawResult.getLuckDrawResults() == null || LuckyDrawResult.getLuckDrawResults().isEmpty()) {
+        if (CollectionUtils.isEmpty(LuckyDrawResult.getLuckDrawResults(GeneralConstant.ADHOC_KEY))) {
             return "failure";
         }
         // prepare encrypted data
-        secureInfo.addAll(LuckyDrawResult.getLuckDrawResults());
+        secureInfo.addAll(LuckyDrawResult.getLuckDrawResults(GeneralConstant.ADHOC_KEY));
         // prepare participate names
         participateNames.addAll(decryptionHandler.preDecryptGetParticipateName());
         return "success";

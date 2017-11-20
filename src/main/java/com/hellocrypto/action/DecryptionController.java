@@ -3,11 +3,13 @@ package com.hellocrypto.action;
 import com.hellocrypto.bo.KeystoreBo;
 import com.hellocrypto.bo.SecureInfoBo;
 import com.hellocrypto.cache.LuckyDrawResult;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.handler.DecryptionHandler;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -38,11 +40,11 @@ public class DecryptionController extends BaseAction {
 
     @Override
     public String execute() {
-        if (LuckyDrawResult.getLuckDrawResults() == null || LuckyDrawResult.getLuckDrawResults().isEmpty()) {
+        if (CollectionUtils.isEmpty(LuckyDrawResult.getLuckDrawResults(GeneralConstant.ADHOC_KEY))) {
             return "failure";
         }
         // prepare encrypted data
-        secureInfo.addAll(LuckyDrawResult.getLuckDrawResults());
+        secureInfo.addAll(LuckyDrawResult.getLuckDrawResults(GeneralConstant.ADHOC_KEY));
         // prepare participate names
         participateNames.addAll(decryptionHandler.preDecryptGetParticipateName());
         SecureInfoBo secureInfoBo = decryptionHandler.getSecureInfo(constructKeystoreBo());

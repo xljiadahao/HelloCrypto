@@ -3,6 +3,7 @@ package com.hellocrypto.dao;
 import com.hellocrypto.entity.Group;
 import javax.transaction.Transactional;
 import org.apache.log4j.Logger;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -17,8 +18,18 @@ public class GroupDaoImpl extends BaseDao<Group> implements GroupDao {
     }
     
     @Override
-    public Group findByGroupId(String groupIdentifier) {
-        return this.findByPrimaryKey(groupIdentifier);
+    @Transactional(Transactional.TxType.REQUIRED)
+    public Group findByGroupId(String groupIdentifier, boolean loadCert) {
+        Group group = this.findByPrimaryKey(groupIdentifier);
+        if (loadCert) {
+            // enforce lazy loading
+            logger.info("enforce lazy loading");
+            if (!CollectionUtils.isEmpty(group.getCertificates())) {
+                logger.info("group: " + groupIdentifier 
+                        + ", cert list size: " + group.getCertificates().size());
+            }
+        }
+        return group;
     }
 
     @Override

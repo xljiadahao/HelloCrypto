@@ -1,6 +1,6 @@
 package com.hellocrypto.handler.validator;
 
-import com.hellocrypto.cache.Constant;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.dao.GroupDao;
 import com.hellocrypto.entity.Group;
 import com.hellocrypto.enumeration.GroupStatus;
@@ -22,12 +22,13 @@ public class AdminCommandValidator {
     private GroupDao groupDao;
     
     public boolean validateStartLuckyDrawReq(Map<String, Object> requestParams) {
+        String groupIdentifier = (String) requestParams.get("groupIdentifier");
         String luckDrawNum = (String) requestParams.get("luckDrawNum");
         List<String> luckDrawText = (List<String>) requestParams.get("luckDrawText");
         String auth = (String) requestParams.get("auth");
         try {
             // auth
-            if (!Constant.AUTH.equals(auth)) {
+            if (!GeneralConstant.AUTH.equals(auth)) {
                 logger.error("bad request, invalid auth, auth: " + auth);
                 return false;
             }
@@ -41,6 +42,13 @@ public class AdminCommandValidator {
             } else {
                 logger.error("bad request, invalid input or auth, luckDrawText = null");
                 return false;
+            }
+            // check group id
+            if (StringUtils.isNotBlank(groupIdentifier)) {
+                if (existGroupValidate(groupIdentifier) == null) {
+                    logger.error("bad request, invalid group identifier");
+                    return false;
+                }
             }
             return true;
         } catch (Exception ex) {
@@ -73,7 +81,7 @@ public class AdminCommandValidator {
         if (StringUtils.isBlank(groupIdentifier)) {
             return null;
         }
-        return groupDao.findByGroupId(groupIdentifier);
+        return groupDao.findByGroupId(groupIdentifier, false);
     }
     
 }

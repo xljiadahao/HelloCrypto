@@ -1,7 +1,9 @@
 package com.hellocrypto.handler;
 
+import com.hellocrypto.bo.EncryptionTransitionBo;
 import com.hellocrypto.bo.LuckyDrawBo;
 import com.hellocrypto.cache.LuckyDrawResult;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.dao.CertificateDao;
 import com.hellocrypto.dao.GroupDao;
 import com.hellocrypto.entity.Certificate;
@@ -27,6 +29,7 @@ import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -55,6 +58,7 @@ public class AdminCommandHandler {
         LuckyDrawBo luckyDrawBo = new LuckyDrawBo();
         try {
             if (adminCommandValidator.validateStartLuckyDrawReq(requestParams)) {
+                String groupIdentifier = (String) requestParams.get("groupIdentifier");
                 Integer resultSize = Integer.parseInt((String)requestParams.get("luckDrawNum"));
                 List<String> luckDrawText = (List<String>) requestParams.get("luckDrawText");
                 logger.info("lucky draw result size: " + resultSize);
@@ -62,9 +66,18 @@ public class AdminCommandHandler {
                 for (String txt : luckDrawText) {
                     logger.info("lucky draw text: " + txt);
                 }
-                // lucky draw for ad-hoc individual user
-                List<Certificate> certificates = certificateDao.findCertificatesByType(ClientType.INDIVIDUAL);
-                if (certificates != null && (certificates.size() >= resultSize)) {
+                List<Certificate> certificates = null;
+                if (StringUtils.isNotBlank(groupIdentifier)) {
+                    certificates = new ArrayList<Certificate>();
+                    Group group = groupDao.findByGroupId(groupIdentifier, true);
+                    certificates.addAll(group.getCertificates());
+                    luckyDrawBo.setOrgName(group.getOrgName());
+                    luckyDrawBo.setActivityName(group.getActivityName());
+                } else {
+                    // lucky draw for ad-hoc individual user
+                    certificates = certificateDao.findCertificatesByType(ClientType.INDIVIDUAL);
+                }
+                if (!CollectionUtils.isEmpty(certificates) && (certificates.size() >= resultSize)) {
                     List<Certificate> drawCers = new ArrayList<Certificate>();
                     int[] index = getRandomIndex(certificates.size(), resultSize);
                     for (int n = 0; n < index.length; n++) {
@@ -73,15 +86,21 @@ public class AdminCommandHandler {
                         drawCers.add(cer);
                     }
                     // generate encryption result
-                    Map<String, String> encryptionResults = generateEncryptionResults(drawCers, luckDrawText);
+                    Map<Long, EncryptionTransitionBo> encryptionResults = generateEncryptionResults(drawCers, luckDrawText);
                     List<String> names = new ArrayList<String>();
                     List<String> encyptContents = new ArrayList<String>();
-                    for (String luckyName : encryptionResults.keySet()) {
-                        names.add(luckyName);
-                        encyptContents.add(encryptionResults.get(luckyName));
+                    for (Long certId : encryptionResults.keySet()) {
+                        names.add(encryptionResults.get(certId).getName());
+                        encyptContents.add(encryptionResults.get(certId).getEncryptText());
                     }
                     // populate result in cache
-                    LuckyDrawResult.setLuckDrawResults(encyptContents);
+                    if (StringUtils.isNotBlank(groupIdentifier)) {
+                        // for org lucky draw result
+                        LuckyDrawResult.setDrawResult(groupIdentifier, encyptContents);
+                    } else {
+                        // for ad-hoc luck draw result
+                        LuckyDrawResult.setDrawResult(GeneralConstant.ADHOC_KEY, encyptContents);
+                    }
                     // populate the response
                     luckyDrawBo.setIsSuccess(Boolean.TRUE);
                     luckyDrawBo.setNames(names);
@@ -185,7 +204,7 @@ public class AdminCommandHandler {
         }
         // 2. duplicated validation
         if (isValid) {
-            Group group = groupDao.findByGroupId(groupIdentifier);
+            Group group = groupDao.findByGroupId(groupIdentifier, false);
             if (group != null) {
                 logger.error("duplicated groupIdentifier");
                 isValid = false;
@@ -212,16 +231,19 @@ public class AdminCommandHandler {
         }
     }
     
-    // <name, encrypted text>
-    private Map<String, String> generateEncryptionResults(List<Certificate> drawCers, List<String> luckDrawText) 
+    // <CertificateId, EncryptionTransitionBo>
+    private Map<Long, EncryptionTransitionBo> generateEncryptionResults(List<Certificate> drawCers, List<String> luckDrawText) 
             throws NoSuchAlgorithmException, InvalidKeySpecException, Exception {
-        Map<String, String> encryptionResults = new HashMap<String, String>();
+        Map<Long, EncryptionTransitionBo> encryptionResults = new HashMap<Long, EncryptionTransitionBo>();
         for (int i = 0; i < drawCers.size(); i++) {
+            EncryptionTransitionBo encryptionTransitionBo = new EncryptionTransitionBo();
             String encryptClearText = luckDrawText.get(i);
             byte[] encryptPubKey = drawCers.get(i).getCertificateBinary();
             String encryptText = ByteUtil.parseByte2HexStr(
                     RSA.encrypt(encryptClearText, RSA.getPubKeyByRawBytes(encryptPubKey)));
-            encryptionResults.put(drawCers.get(i).getName(), encryptText);
+            encryptionTransitionBo.setEncryptText(encryptText);
+            encryptionTransitionBo.setName(drawCers.get(i).getName());
+            encryptionResults.put(drawCers.get(i).getId(), encryptionTransitionBo);
         }
         return encryptionResults;
     }
