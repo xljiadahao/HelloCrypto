@@ -35,7 +35,7 @@
                 <div id="header">
                     <div id="rightheader">
                         <h1 id="brand" >
-                            <a href="#" style="font-family:verdana; color: blue;">PayPal</a>
+                            <a href="#" style="font-family:verdana; color: blue;">微信小程序</a>
                         </h1>
                     </div>
                     <div id="topheader">
