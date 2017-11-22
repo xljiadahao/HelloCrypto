@@ -6,8 +6,10 @@ import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import javax.crypto.Cipher;
 
@@ -49,6 +51,12 @@ public class RSA {
         return keyFactory.generatePublic(keySpec);
     }
 
+    public static PrivateKey loadPrivateKeyByRawBytes(byte[] encodedPrivateKey) 
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(encodedPrivateKey);
+        return KeyFactory.getInstance("RSA").generatePrivate(privateKeySpec);
+    }
+    
     /**
      * generate RSA key pair by Java API
      *

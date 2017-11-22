@@ -6,6 +6,7 @@ import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.constant.ResponseMessage;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.CertificateHandler;
+import com.hellocrypto.handler.DecryptionHandler;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,8 @@ public class ClientParticipationController {
     
     @Autowired
     private CertificateHandler crtificateHandler;
+    @Autowired
+    private DecryptionHandler decryptionHandler;
     
     public ClientParticipationController() {}
     
@@ -64,4 +67,16 @@ public class ClientParticipationController {
         }
     }
     
+    /**
+     * RSA decryption
+     * request: secureKey, encryptMessage
+     */
+    @RequestMapping(value = "orgdrawdecription", method = RequestMethod.POST, produces = "text/html; charset=utf-8")
+    @ResponseBody
+    public String getSecureMessage(HttpServletRequest servletRequest, HttpServletResponse servletResponse, 
+            @RequestBody Map<String, Object> requestBody) {
+        logger.info("org lucky draw, get secure message");
+        return decryptionHandler.getSecureInfo(requestBody);
+    }
+
 }
