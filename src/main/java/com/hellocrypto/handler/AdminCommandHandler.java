@@ -1,6 +1,7 @@
 package com.hellocrypto.handler;
 
 import com.hellocrypto.bo.EncryptionTransitionBo;
+import com.hellocrypto.bo.GroupGenBo;
 import com.hellocrypto.bo.LuckyDrawBo;
 import com.hellocrypto.cache.LuckyDrawResult;
 import com.hellocrypto.constant.GeneralConstant;
@@ -54,10 +55,10 @@ public class AdminCommandHandler {
         this.certificateDao = certificateDao;
     }
     
-    public LuckyDrawBo handleLuckyDrawReq(Map<String, Object> requestParams) {
+    public LuckyDrawBo handleLuckyDrawReq(Map<String, Object> requestParams, String securityContext) {
         LuckyDrawBo luckyDrawBo = new LuckyDrawBo();
         try {
-            if (adminCommandValidator.validateStartLuckyDrawReq(requestParams)) {
+            if (adminCommandValidator.validateStartLuckyDrawReq(requestParams, securityContext)) {
                 String groupIdentifier = (String) requestParams.get("groupIdentifier");
                 Integer resultSize = Integer.parseInt((String)requestParams.get("luckDrawNum"));
                 List<String> luckDrawText = (List<String>) requestParams.get("luckDrawText");
@@ -124,7 +125,7 @@ public class AdminCommandHandler {
         return luckyDrawBo;
     }
     
-    public String generateGroupIdentifier(Map<String, Object> requestParams) 
+    public GroupGenBo generateGroupIdentifier(Map<String, Object> requestParams) 
             throws NoSuchAlgorithmException, UnsupportedEncodingException, BadReqException {
         if (adminCommandValidator.validateGenGroupIdReq(requestParams)) {
             String orgName = (String) requestParams.get("orgName");
@@ -158,7 +159,10 @@ public class AdminCommandHandler {
             Group newRegisteredGroup = constructGroupEntity(groupIdentifier, orgName, activityName, maxCount);
             try{
                 groupDao.registerGroup(newRegisteredGroup);
-                return newRegisteredGroup.getIdentifier();
+                GroupGenBo groupGenBo = new GroupGenBo();
+                groupGenBo.setGroupIdentifier(newRegisteredGroup.getIdentifier());
+                groupGenBo.setCreateTime(newRegisteredGroup.getTimestamp().getTime());
+                return groupGenBo;
             } catch (Exception ex) {
                 logger.error("group persistence error, " + ex.getMessage());
                 throw new RuntimeException("group persistence error, " + ex.getMessage());
@@ -168,10 +172,10 @@ public class AdminCommandHandler {
         }
     }
     
-    public Boolean changeGroupChannelStatus(Map<String, Object> requestBody) {
+    public Boolean changeGroupChannelStatus(Map<String, Object> requestBody, String securityContext) {
         String groupIdentifier = (String) requestBody.get("groupIdentifier");
         String groupStatus = (String) requestBody.get("groupStatus");
-        Group group = adminCommandValidator.validateChangeGroupStatusReq(groupIdentifier, groupStatus);
+        Group group = adminCommandValidator.validateChangeGroupStatusReq(groupIdentifier, groupStatus, securityContext);
         if (group != null) {
             group.setIsActivated(GroupStatus.valueOf(groupStatus).getPersistFlag());
             groupDao.updateGroup(group);

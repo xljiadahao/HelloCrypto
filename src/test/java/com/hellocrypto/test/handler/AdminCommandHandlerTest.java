@@ -1,6 +1,7 @@
 package com.hellocrypto.test.handler;
 
 import com.hellocrypto.bo.LuckyDrawBo;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.dao.CertificateDaoImpl;
 import com.hellocrypto.entity.Certificate;
 import com.hellocrypto.enumeration.ClientType;
@@ -95,8 +96,7 @@ public class AdminCommandHandlerTest {
         luckDrawText.add("Luck Draw by Mockito");
         luckDrawText.add("Luck Draw by JUnit");
         requestParams.put("luckDrawText", luckDrawText);
-        requestParams.put("auth", "xulei");
-        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams);
+        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams, GeneralConstant.AUTH);
         System.out.println("Is Success: " + luckyDrawBo.getIsSuccess() + " - Lucky Draw Num: " + luckyDrawBo.getLuckydrawNum() 
                 + " - Description: " + luckyDrawBo.getDescription() + " - Timestamp: " + luckyDrawBo.getTimestamp() 
                 + " - Name Size: " + luckyDrawBo.getNames().size() + " - Result Size: " + luckyDrawBo.getResultList().size());
@@ -113,8 +113,7 @@ public class AdminCommandHandlerTest {
         List<String> luckDrawText = new ArrayList<String>();
         luckDrawText.add("Luck Draw by Mockito");
         requestParams.put("luckDrawText", luckDrawText);
-        requestParams.put("auth", "xulei");
-        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams);
+        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams, GeneralConstant.AUTH);
         System.out.println("Is Success: " + luckyDrawBo.getIsSuccess() + " - Lucky Draw Num: " + luckyDrawBo.getLuckydrawNum() 
                 + " - Description: " + luckyDrawBo.getDescription() + " - Timestamp: " + luckyDrawBo.getTimestamp());
         assertFalse(luckyDrawBo.getIsSuccess());

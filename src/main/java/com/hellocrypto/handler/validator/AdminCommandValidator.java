@@ -21,17 +21,12 @@ public class AdminCommandValidator {
     @Autowired
     private GroupDao groupDao;
     
-    public boolean validateStartLuckyDrawReq(Map<String, Object> requestParams) {
+    public boolean validateStartLuckyDrawReq(Map<String, Object> requestParams, String securityContext) {
         String groupIdentifier = (String) requestParams.get("groupIdentifier");
         String luckDrawNum = (String) requestParams.get("luckDrawNum");
         List<String> luckDrawText = (List<String>) requestParams.get("luckDrawText");
-        String auth = (String) requestParams.get("auth");
+        // String auth = (String) requestParams.get("auth");
         try {
-            // auth
-            if (!GeneralConstant.AUTH.equals(auth)) {
-                logger.error("bad request, invalid auth, auth: " + auth);
-                return false;
-            }
             // check input
             Integer resultNum = Integer.parseInt(luckDrawNum);
             if (luckDrawText != null) {
@@ -44,9 +39,23 @@ public class AdminCommandValidator {
                 return false;
             }
             // check group id
+            Group group = null;
             if (StringUtils.isNotBlank(groupIdentifier)) {
-                if (existGroupValidate(groupIdentifier) == null) {
+                group = existGroupValidate(groupIdentifier);
+                if (group == null) {
                     logger.error("bad request, invalid group identifier");
+                    return false;
+                }
+            }
+            // auth
+            if (group != null) {
+                if (!adminAuthentication(group, securityContext)) {
+                    logger.error("bad request, invalid auth, securityContext: " + securityContext);
+                    return false;
+                }
+            } else {
+                if (!GeneralConstant.AUTH.equals(securityContext)) {
+                    logger.error("bad request, invalid auth, securityContext: " + securityContext);
                     return false;
                 }
             }
@@ -67,14 +76,20 @@ public class AdminCommandValidator {
         return true;
     }
     
-    public Group validateChangeGroupStatusReq(String groupIdentifier, String groupStatus) {
+    public Group validateChangeGroupStatusReq(String groupIdentifier, String groupStatus, String securityContext) {
         try {
             GroupStatus.valueOf(groupStatus);
         } catch (Exception ex) {
             logger.error("bad request, invalid groupStatus, " + ex.getMessage());
             return null;
         }
-        return existGroupValidate(groupIdentifier);
+        Group group = existGroupValidate(groupIdentifier);
+        if (adminAuthentication(group, securityContext)) {
+            return group;
+        } else {
+            logger.error("bad request, change groupStatus, invalid auth");
+            return null;
+        }
     }
     
     private Group existGroupValidate(String groupIdentifier) {
@@ -82,6 +97,21 @@ public class AdminCommandValidator {
             return null;
         }
         return groupDao.findByGroupId(groupIdentifier, false);
+    }
+    
+    private boolean adminAuthentication(Group group, String securityContex) {
+        try {
+            long createTime = Long.parseLong(securityContex);
+            createTime = createTime/1000*1000;
+            if (createTime == group.getTimestamp().getTime()) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(Exception ex) {
+            logger.error("bad request, invalid securityContex, " + ex.getMessage());
+            return false;
+        }
     }
     
 }
