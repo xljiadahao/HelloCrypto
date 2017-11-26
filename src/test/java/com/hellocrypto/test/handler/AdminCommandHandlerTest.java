@@ -1,8 +1,10 @@
 package com.hellocrypto.test.handler;
 
 import com.hellocrypto.bo.LuckyDrawBo;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.dao.CertificateDaoImpl;
 import com.hellocrypto.entity.Certificate;
+import com.hellocrypto.enumeration.ClientType;
 import com.hellocrypto.handler.AdminCommandHandler;
 import com.hellocrypto.handler.validator.AdminCommandValidator;
 import com.hellocrypto.utils.ByteUtil;
@@ -22,6 +24,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import static org.junit.Assert.*;
+import org.mockito.Matchers;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -51,7 +55,7 @@ public class AdminCommandHandlerTest {
         mockCertificateDao = mock(CertificateDaoImpl.class);
         
         certificate1 = new Certificate();
-        certificate1.setId(1);
+        certificate1.setId(1L);
         certificate1.setName("mock cer 1");
         String cer1Fingerprint = MD5.md5Base64(ByteUtil.parseByte2HexStr(ByteUtil.int2byte(1)));
         certificate1.setCertificateBinary(cerRawBinary);
@@ -59,7 +63,7 @@ public class AdminCommandHandlerTest {
         certificate1.setTimestamp(new Timestamp(new Date().getTime()));
         
         certificate2 = new Certificate();
-        certificate2.setId(2);
+        certificate2.setId(2L);
         certificate2.setName("mock cer 2");
         String cer2Fingerprint = MD5.md5Base64(ByteUtil.parseByte2HexStr(ByteUtil.int2byte(2)));
         certificate2.setCertificateBinary(cerRawBinary);
@@ -67,7 +71,7 @@ public class AdminCommandHandlerTest {
         certificate2.setTimestamp(new Timestamp(new Date().getTime()));
         
         certificate3 = new Certificate();
-        certificate3.setId(3);
+        certificate3.setId(3L);
         certificate3.setName("mock cer 3");
         String cer3Fingerprint = MD5.md5Base64(ByteUtil.parseByte2HexStr(ByteUtil.int2byte(3)));
         certificate3.setCertificateBinary(cerRawBinary);
@@ -79,6 +83,7 @@ public class AdminCommandHandlerTest {
         certificates.add(certificate2);
         certificates.add(certificate3);
         when(mockCertificateDao.findAll()).thenReturn(certificates);
+        when(mockCertificateDao.findCertificatesByType(Mockito.any(ClientType.class))).thenReturn(certificates);
         
         adminCommandHandler = new AdminCommandHandler(new AdminCommandValidator(), mockCertificateDao);
     }
@@ -91,8 +96,7 @@ public class AdminCommandHandlerTest {
         luckDrawText.add("Luck Draw by Mockito");
         luckDrawText.add("Luck Draw by JUnit");
         requestParams.put("luckDrawText", luckDrawText);
-        requestParams.put("auth", "xulei");
-        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams);
+        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams, GeneralConstant.AUTH);
         System.out.println("Is Success: " + luckyDrawBo.getIsSuccess() + " - Lucky Draw Num: " + luckyDrawBo.getLuckydrawNum() 
                 + " - Description: " + luckyDrawBo.getDescription() + " - Timestamp: " + luckyDrawBo.getTimestamp() 
                 + " - Name Size: " + luckyDrawBo.getNames().size() + " - Result Size: " + luckyDrawBo.getResultList().size());
@@ -109,8 +113,7 @@ public class AdminCommandHandlerTest {
         List<String> luckDrawText = new ArrayList<String>();
         luckDrawText.add("Luck Draw by Mockito");
         requestParams.put("luckDrawText", luckDrawText);
-        requestParams.put("auth", "xulei");
-        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams);
+        LuckyDrawBo luckyDrawBo = adminCommandHandler.handleLuckyDrawReq(requestParams, GeneralConstant.AUTH);
         System.out.println("Is Success: " + luckyDrawBo.getIsSuccess() + " - Lucky Draw Num: " + luckyDrawBo.getLuckydrawNum() 
                 + " - Description: " + luckyDrawBo.getDescription() + " - Timestamp: " + luckyDrawBo.getTimestamp());
         assertFalse(luckyDrawBo.getIsSuccess());

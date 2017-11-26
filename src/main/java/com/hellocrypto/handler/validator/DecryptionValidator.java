@@ -2,6 +2,7 @@ package com.hellocrypto.handler.validator;
 
 import com.hellocrypto.bo.KeystoreBo;
 import java.io.File;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -23,6 +24,14 @@ public class DecryptionValidator {
             return false;
         }
         return true;
+    }
+    
+    public boolean validate(String privateKey, String encryptMessage) {
+        if (StringUtils.isNotBlank(privateKey) && StringUtils.isNotBlank(encryptMessage)) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
 }

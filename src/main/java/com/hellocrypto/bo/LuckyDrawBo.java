@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  *
- * @author leixu2
+ * @author xulei
  */
 public class LuckyDrawBo {
 
@@ -13,6 +13,8 @@ public class LuckyDrawBo {
     private List<String> names;
     private List<String> resultList;
     private String timestamp;
+    private String orgName;
+    private String activityName;
     private String description;
 
     public Boolean getIsSuccess() {
@@ -53,6 +55,22 @@ public class LuckyDrawBo {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+    
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getActivityName() {
+        return activityName;
+    }
+
+    public void setActivityName(String activityName) {
+        this.activityName = activityName;
     }
     
     public String getDescription() {

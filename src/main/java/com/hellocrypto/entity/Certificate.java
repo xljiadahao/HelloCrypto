@@ -1,5 +1,6 @@
 package com.hellocrypto.entity;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import javax.persistence.Basic;
@@ -7,21 +8,28 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
  *
- * @author leixu2
+ * @author xulei
  */
 @Entity
-@Table(name="certificate")
-public class Certificate {
+@Table(name="`certificate`")
+@NamedQueries({
+    @NamedQuery(name = "Certificate.findCertificatesByType", 
+            query = "SELECT cert FROM Certificate cert WHERE cert.type = :type ORDER BY cert.timestamp DESC")})
+public class Certificate implements Serializable {
 
     @Id
     @GeneratedValue
     @Column(name = "ID")
-    private Integer id;
+    private Long id;
     @Basic
     @Column(name="NAME")
     private String name;
@@ -33,14 +41,21 @@ public class Certificate {
     @Lob
     private byte[] certificateBinary;
     @Basic
+    @Column(name="TYPE")
+    private String type;
+    @Basic
     @Column(name="TIMESTAMP")
     private Timestamp timestamp;
+    
+    @JoinColumn(name = "GROUP_ID", referencedColumnName = "IDENTIFIER")
+    @ManyToOne(optional = true)
+    private Group group;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -68,12 +83,28 @@ public class Certificate {
         this.certificateBinary = certificateBinary;
     }
     
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+    
     public Timestamp getTimestamp() {
         return timestamp;
     }
     
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     @Override

@@ -1,11 +1,13 @@
 package com.hellocrypto.action;
 
 import com.hellocrypto.cache.LuckyDrawResult;
+import com.hellocrypto.constant.GeneralConstant;
 import com.hellocrypto.exception.BadReqException;
 import com.hellocrypto.handler.CertificateHandler;
 import java.io.File;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 /**
  *
@@ -47,7 +49,7 @@ public class CollectCertificateController extends BaseAction {
     }
 
     public String prereq() {
-        if (LuckyDrawResult.getLuckDrawResults() != null && !LuckyDrawResult.getLuckDrawResults().isEmpty()) {
+        if (!CollectionUtils.isEmpty(LuckyDrawResult.getLuckDrawResults(GeneralConstant.ADHOC_KEY))) {
             decryptEnabled = true;
         }
         return "success";
