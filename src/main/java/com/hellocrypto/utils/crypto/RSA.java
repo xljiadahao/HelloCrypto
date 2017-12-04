@@ -25,7 +25,8 @@ public class RSA {
     public static byte[] encrypt(String content, Key pbk) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, pbk);
-        byte[] encryptedData = cipher.doFinal(content.getBytes());
+        // bug fixing, Chinese characters encoding with UTF-8 instead of default encoding
+        byte[] encryptedData = cipher.doFinal(content.getBytes("UTF-8"));
         return encryptedData;
     }
     
