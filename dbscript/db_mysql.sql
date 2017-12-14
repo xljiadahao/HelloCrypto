@@ -3,6 +3,7 @@
  * Created: Nov 06, 2016
  * Updated on Nov 15 2017 for multi-tenant by xulei
  * Updated on Nov 17 2017 for group certificate one-many relationship
+ * Updated on Dec 13 2017 for delete the not null constraint for column `GROUP_ID` of table `certificate` for adhoc use case
  */
 
 CREATE DATABASE hellocrypto;
@@ -40,6 +41,11 @@ PRIMARY KEY (`ID`),
 constraint GROUP_IDENTIFIER_FK foreign key(`GROUP_ID`) 
 references `group`(`IDENTIFIER`) on delete cascade
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ---------------------------------------------------------------
+-- Table `certificate` Update
+-- ---------------------------------------------------------------
+ALTER TABLE `certificate` MODIFY `GROUP_ID` varchar(10) NULL;
 
 -- ---------------------------------------------------------------
 -- Table group_certificate_mapping (@Deprecated), 
