@@ -11,7 +11,7 @@
 
     <properties>
         <org.springframework.version>4.3.23.RELEASE</org.springframework.version>
-        <org.hibernate.version>4.3.6.Final</org.hibernate.version>
+        <org.hibernate.version>5.3.20.Final</org.hibernate.version>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
